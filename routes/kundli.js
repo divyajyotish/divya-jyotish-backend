@@ -47,4 +47,30 @@ router.post("/generate", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/rashi", verifyToken, async (req, res) => {
+  try {
+    const { rashi } = req.body;
+
+    const prompt = `તમે એક અનુભવી જ્યોતિષ છો. ${rashi} રાશિ માટે આજનું ગુજરાતીમાં ભવિષ્ય આપો. આ વિષયો આવરી લો:
+1. આજનો દિવસ કેવો રહેશે
+2. પ્રેમ અને સંબંધ
+3. કારકિર્દી અને પૈસા
+4. સ્વાસ્થ્ય
+5. શુભ રંગ અને અંક
+
+ટૂંકમાં અને સ્પષ્ટ જવાબ આપો.`;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        contents: [{ parts: [{ text: prompt }] }]
+      }
+    );
+
+    const bhavishya = response.data.candidates[0].content.parts[0].text;
+    res.json({ success: true, bhavishya });
+  } catch (err) {
+    res.json({ message: "Error", error: err.message });
+  }
+});
 export default router;
