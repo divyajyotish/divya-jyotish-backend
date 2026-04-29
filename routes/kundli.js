@@ -26,22 +26,13 @@ router.post("/generate", verifyToken, async (req, res) => {
 ટૂંકમાં અને સ્પષ્ટ જવાબ આપો.`;
 
     const response = await axios.post(
-      "https://api.anthropic.com/v1/messages",
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 1024,
-        messages: [{ role: "user", content: prompt }],
-      },
-      {
-        headers: {
-          "x-api-key": process.env.ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-          "content-type": "application/json",
-        },
+        contents: [{ parts: [{ text: prompt }] }]
       }
     );
 
-    const kundliText = response.data.content[0].text;
+    const kundliText = response.data.candidates[0].content.parts[0].text;
 
     res.json({
       success: true,
